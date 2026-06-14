@@ -3,6 +3,10 @@ Ext.define('Rambox.view.main.MainController', {
 
 	,alias: 'controller.main'
 
+	,requires: [
+		'Rambox.view.main.GroupController'
+	]
+
 	,initialize: function( tabPanel ) {
 		const config = ipc.sendSync('getConfig');
 
@@ -479,5 +483,57 @@ Ext.define('Rambox.view.main.MainController', {
 
 	,openPreferences: function( btn ) {
 		Ext.create('Rambox.view.preferences.Preferences').show();
+	}
+
+	// ----------------------------------------------------------------
+	// Group management delegates
+	//
+	// These thin wrappers forward to GroupController so that callers
+	// inside Main's scope can keep using `handler: 'methodName'` syntax
+	// without the implementation living in MainController.
+	// ----------------------------------------------------------------
+
+	,_groupController: function() {
+		// Lazily instantiate the GroupController if it hasn't been attached yet.
+		if (!this._groupCtrl) {
+			this._groupCtrl = Ext.create('Rambox.view.main.GroupController');
+		}
+		return this._groupCtrl;
+	}
+
+	,toggleGroupCollapse: function(groupId) {
+		this._groupController().toggleGroupCollapse(groupId);
+	}
+
+	,expandGroup: function(groupId) {
+		this._groupController().expandGroup(groupId);
+	}
+
+	,applyGroupCollapseState: function(groupId) {
+		this._groupController().applyGroupCollapseState(groupId);
+	}
+
+	,renameGroup: function(oldName, newName) {
+		this._groupController().renameGroup(oldName, newName);
+	}
+
+	,changeGroupColor: function(groupId, color) {
+		this._groupController().changeGroupColor(groupId, color);
+	}
+
+	,muteGroupServices: function(groupId, muted) {
+		this._groupController().muteGroupServices(groupId, muted);
+	}
+
+	,deleteGroup: function(groupId) {
+		this._groupController().deleteGroup(groupId);
+	}
+
+	,openGroupManager: function() {
+		this._groupController().openGroupManager();
+	}
+
+	,rebuildTabBar: function() {
+		this._groupController().rebuildTabBar();
 	}
 });

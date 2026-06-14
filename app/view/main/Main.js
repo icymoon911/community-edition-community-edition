@@ -2,6 +2,7 @@ Ext.define('Rambox.view.main.Main', {
 	 extend: 'Ext.tab.Panel'
 	,requires: [
 		 'Rambox.view.main.MainController'
+		,'Rambox.view.main.GroupController'
 		,'Rambox.view.main.MainModel'
 		,'Rambox.ux.WebView'
 		,'Rambox.ux.mixin.Badge'
