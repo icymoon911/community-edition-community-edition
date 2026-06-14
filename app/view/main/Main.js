@@ -3,8 +3,15 @@ Ext.define('Rambox.view.main.Main', {
 	,requires: [
 		 'Rambox.view.main.MainController'
 		,'Rambox.view.main.MainModel'
+		,'Rambox.view.main.GroupController'
 		,'Rambox.ux.WebView'
 		,'Rambox.ux.mixin.Badge'
+		,'Rambox.ux.mixin.Search'
+		,'Rambox.ux.mixin.Zoom'
+		,'Rambox.ux.mixin.WebViewEvents'
+		,'Rambox.ux.ContextMenuBuilder'
+		,'Rambox.util.ElectronBridge'
+		,'Rambox.util.TabConfigBuilder'
 		,'Rambox.view.add.Add'
 		,'Ext.ux.TabReorderer'
 	]
