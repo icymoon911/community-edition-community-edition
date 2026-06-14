@@ -245,8 +245,15 @@ function createMasterPasswordWindow() {
 }
 
 function updateBadge(title) {
-	title = title.split(" - ")[0]; //Discard service name if present, could also contain digits
-	var messageCount = title.match(/\d+/g) ? parseInt(title.match(/\d+/g).join("")) : 0;
+	// Title formats produced by Rambox renderer:
+	//   "Rambox"                       -> 0
+	//   "Rambox (N)"                   -> N
+	//   "Rambox - ServiceName"         -> 0
+	//   "Rambox (N) - ServiceName"     -> N
+	// Extract only the first parenthesised group (the Rambox counter) so that
+	// digits coming from the service name (e.g. "Gmail 2") are never counted.
+	var countMatch = title.match(/\((\d[\d,]*)\)/);
+	var messageCount = countMatch ? parseInt(countMatch[1].replace(/,/g, ''), 10) : 0;
 	messageCount = isNaN(messageCount) ? 0 : messageCount;
 
 	tray.setBadge(messageCount, config.get('systemtray_indicator'));

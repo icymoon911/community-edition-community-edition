@@ -310,7 +310,7 @@ Ext.define('Rambox.view.main.MainController', {
 			tab.setNotifications(btn.pressed ? false : tab.record.get('notifications'), true);
 		});
 
-		localStorage.setItem('dontDisturb', btn.pressed);
+		localStorage.setItem('dontDisturb', JSON.stringify(btn.pressed));
 
 		ipc.send('setDontDisturb', btn.pressed);
 

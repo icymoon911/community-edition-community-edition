@@ -95,7 +95,10 @@ Ext.define('Rambox.view.add.AddController', {
 				,displayTabUnreadCounter: formValues.displayTabUnreadCounter
 				,includeInGlobalUnreadCounter: formValues.includeInGlobalUnreadCounter
 				,trust: formValues.trust
+				,enabled: true
+				,disableAutoReloadOnFail: formValues.disableAutoReloadOnFail
 				,js_unread: formValues.js_unread
+				,zoomLevel: 0
 			});
 			service.save();
 			Ext.getStore('Services').add(service);

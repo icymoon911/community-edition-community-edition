@@ -274,6 +274,9 @@ Ext.define('Rambox.ux.WebView',{
 		var webview = me.getWebView();
 		me.errorCodeLog = []
 
+		// Sync internal zoom level from persisted record so Reset Zoom works
+		me.zoomLevel = me.record.get('zoomLevel') || 0;
+
 		// Notifications in Webview
 		me.setNotifications(localStorage.getItem('locked') || JSON.parse(localStorage.getItem('dontDisturb')) ? false : me.record.get('notifications'));
 
@@ -299,8 +302,10 @@ Ext.define('Rambox.ux.WebView',{
 		webview.addEventListener("did-finish-load", function(e) {
 			Rambox.app.setTotalServicesLoaded( Rambox.app.getTotalServicesLoaded() + 1 );
 
-			// Apply saved zoom level
-			webview.setZoomLevel(me.record.get('zoomLevel'));
+			// Apply saved zoom level and sync internal state
+			var savedZoom = me.record.get('zoomLevel') || 0;
+			webview.setZoomLevel(savedZoom);
+			me.zoomLevel = savedZoom;
 
 			// Fix cursor sometimes dissapear
 			let currentTab = Ext.cq1('app-main').getActiveTab();
@@ -763,28 +768,36 @@ Ext.define('Rambox.ux.WebView',{
 	}
 
 	,zoomIn: function() {
-		if ( this.timeout ) clearTimeout( this.timeout );
-			this.timeout = setTimeout(() => {
-				var me = this;
-				var webview = me.getWebView();
-				me.zoomLevel = me.zoomLevel + 0.25;
-				if ( me.record.get('enabled') ) {
-					webview.setZoomLevel(me.zoomLevel);
-					me.record.set('zoomLevel', me.zoomLevel);
-				}
+		var me = this;
+		var webview = me.getWebView();
+
+		// Apply zoom immediately so each scroll step takes effect
+		me.zoomLevel = me.zoomLevel + 0.25;
+		if ( me.record.get('enabled') ) {
+			webview.setZoomLevel(me.zoomLevel);
+		}
+
+		// Debounce the persist to record so rapid scrolls don't thrash storage
+		if ( me.timeout ) clearTimeout( me.timeout );
+		me.timeout = setTimeout(function() {
+			me.record.set('zoomLevel', me.zoomLevel);
 		}, 100);
 	}
 
 	,zoomOut: function() {
-		if ( this.timeout ) clearTimeout( this.timeout );
-			this.timeout = setTimeout(() => {
-				var me = this;
-				var webview = me.getWebView();
-				me.zoomLevel = me.zoomLevel - 0.25;
-				if ( me.record.get('enabled') ) {
-					webview.setZoomLevel(me.zoomLevel);
-					me.record.set('zoomLevel', me.zoomLevel);
-				}
+		var me = this;
+		var webview = me.getWebView();
+
+		// Apply zoom immediately so each scroll step takes effect
+		me.zoomLevel = me.zoomLevel - 0.25;
+		if ( me.record.get('enabled') ) {
+			webview.setZoomLevel(me.zoomLevel);
+		}
+
+		// Debounce the persist to record so rapid scrolls don't thrash storage
+		if ( me.timeout ) clearTimeout( me.timeout );
+		me.timeout = setTimeout(function() {
+			me.record.set('zoomLevel', me.zoomLevel);
 		}, 100);
 	}
 

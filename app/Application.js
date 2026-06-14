@@ -218,8 +218,8 @@ Ext.define('Rambox.Application', {
 			});
 
 			// Define default value
-			if ( localStorage.getItem('dontDisturb') === null ) localStorage.setItem('dontDisturb', false);
-			ipc.send('setDontDisturb', localStorage.getItem('dontDisturb')); // We store it in config
+			if ( localStorage.getItem('dontDisturb') === null ) localStorage.setItem('dontDisturb', JSON.stringify(false));
+			ipc.send('setDontDisturb', JSON.parse(localStorage.getItem('dontDisturb'))); // We store it in config
 
 			if ( localStorage.getItem('locked') ) {
 				console.info('Lock Rambox:', 'Enabled');

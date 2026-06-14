@@ -66,6 +66,10 @@ Ext.define('Rambox.model.Service', {
 		,type: 'string'
 		,defaultValue: ''
 	},{
+		 name: 'disableAutoReloadOnFail'
+		,type: 'boolean'
+		,defaultValue: false
+	},{
 		 name: 'zoomLevel'
 		,type: 'number'
 		,defaultValue: 0
