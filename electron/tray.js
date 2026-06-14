@@ -21,6 +21,14 @@ exports.create = function(win, config) {
 			}
 		},
 		{
+			 label: 'View Service Status'
+			,click() {
+				win.show();
+				win.focus();
+				win.webContents.executeJavaScript('ipc.send("showHealthOverview");');
+			}
+		},
+		{
 			type: 'separator'
 		},
 		{

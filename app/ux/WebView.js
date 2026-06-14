@@ -289,11 +289,19 @@ Ext.define('Rambox.ux.WebView',{
 
 			if ( !me.down('statusbar').closed || !me.down('statusbar').keep ) me.down('statusbar').show();
 			me.down('statusbar').showBusy();
+
+			// Sync load status to Service model
+			me.record.set('loadStatus', 'loading');
+			me.record.commit();
 		});
 
 		webview.addEventListener("did-stop-loading", function() {
 			me.down('statusbar').clearStatus({useDefaults: true});
 			if ( !me.down('statusbar').keep ) me.down('statusbar').hide();
+
+			// Sync load status to Service model
+			me.record.set('loadStatus', 'ready');
+			me.record.commit();
 		});
 
 		webview.addEventListener("did-finish-load", function(e) {
@@ -317,7 +325,7 @@ Ext.define('Rambox.ux.WebView',{
 			me.onSearchText(e.result)
 		});
 
-		// On search text
+		// On service load failure
 		webview.addEventListener('did-fail-load', function(e) {
 			console.info('The service fail at loading', me.src, e);
 
@@ -325,6 +333,13 @@ Ext.define('Rambox.ux.WebView',{
 			me.errorCodeLog.push(e.errorCode)
 
 			var attempt = me.errorCodeLog.filter(function(code) { return code === e.errorCode });
+			var maxAttempts = ipc.sendSync('getConfig').maxAutoReloadAttempts || 5;
+
+			// Update failure tracking on Service model
+			me.record.set('loadStatus', 'failed');
+			me.record.set('lastFailTime', new Date().toISOString());
+			me.record.set('failCount', (me.record.get('failCount') || 0) + 1);
+			me.record.commit();
 
 			// Error codes: https://cs.chromium.org/chromium/src/net/base/net_error_list.h
 			var msg = []
@@ -345,7 +360,7 @@ Ext.define('Rambox.ux.WebView',{
 				case 0:
 					break
 				case -3: // An operation was aborted (due to user action) I think that gmail an other pages that use iframes stop some of them making this error fired
-					if ( attempt.length <= 4 ) return
+					if ( attempt.length < maxAttempts ) return
 					setTimeout(() => me.reloadService(me), 200);
 					me.errorCodeLog = []
 					break;
@@ -357,7 +372,7 @@ Ext.define('Rambox.ux.WebView',{
 				case -100:
 				case -101:
 				case -105:
-					attempt.length > 4 ? me.onFailLoad(msg[e.errorCode]) : setTimeout(() => me.reloadService(me), 2000);
+					attempt.length >= maxAttempts ? me.onFailLoad(msg[e.errorCode]) : setTimeout(() => me.reloadService(me), 2000);
 					break;
 				case -106:
 					me.onFailLoad(msg[e.errorCode])
@@ -368,7 +383,15 @@ Ext.define('Rambox.ux.WebView',{
 					// Note that this does NOT include failures during the actual "CONNECT" method
 					// of an HTTP proxy.
 				case -300:
-					attempt.length > 4 ? me.onFailLoad(msg[e.errorCode]) : me.reloadService(me);
+					attempt.length >= maxAttempts ? me.onFailLoad(msg[e.errorCode]) : me.reloadService(me);
+					break;
+				default:
+					// For unknown error codes, apply default retry behavior
+					if ( attempt.length >= maxAttempts ) {
+						me.onFailLoad('Error code: ' + e.errorCode);
+					} else {
+						setTimeout(() => me.reloadService(me), 2000);
+					}
 					break;
 			}
 		});

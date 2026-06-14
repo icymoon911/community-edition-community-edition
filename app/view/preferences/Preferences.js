@@ -259,6 +259,18 @@ Ext.define('Rambox.view.preferences.Preferences',{
 						,value: config.flash_frame
 					}
 					,{
+						 xtype: 'numberfield'
+						,name: 'maxAutoReloadAttempts'
+						,fieldLabel: 'Max auto-retry attempts on service load failure'
+						,labelAlign: 'left'
+						,width: 380
+						,labelWidth: 250
+						,value: config.maxAutoReloadAttempts != null ? config.maxAutoReloadAttempts : 5
+						,minValue: 1
+						,maxValue: 50
+						,allowDecimals: false
+					}
+					,{
 						 xtype: 'checkbox'
 						,name: 'disable_gpu'
 						,boxLabel: locale['preferences[23]']

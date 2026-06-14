@@ -6,6 +6,7 @@ Ext.define('Rambox.view.main.Main', {
 		,'Rambox.ux.WebView'
 		,'Rambox.ux.mixin.Badge'
 		,'Rambox.view.add.Add'
+		,'Rambox.view.main.HealthOverview'
 		,'Ext.ux.TabReorderer'
 	]
 
@@ -148,6 +149,30 @@ Ext.define('Rambox.view.main.Main', {
 					]
 					,columns: [
 						{
+							 dataIndex: 'loadStatus'
+							,width: 30
+							,align: 'center'
+							,tooltip: 'Service Status'
+							,renderer: function(value, metaData, record) {
+								var color, tip;
+								if (!record.get('enabled')) {
+									color = '#999';
+									tip = 'Disabled';
+								} else if (value === 'failed') {
+									color = '#f44336';
+									tip = 'Failed';
+								} else if (value === 'loading') {
+									color = '#ff9800';
+									tip = 'Loading';
+								} else {
+									color = '#4caf50';
+									tip = 'Ready';
+								}
+								metaData.tdAttr = 'data-qtip="' + tip + '"';
+								return '<svg width="12" height="12" style="vertical-align:middle;"><circle cx="6" cy="6" r="5" fill="' + color + '" stroke="' + color + '" /></svg>';
+							}
+						}
+						,{
 							 xtype: 'templatecolumn'
 							,width: 52
 							,variableRowHeight: true
@@ -249,6 +274,13 @@ Ext.define('Rambox.view.main.Main', {
 						,tooltip: locale['app.main[20]']+'<br/><b>'+locale['app.main[18]']+(require('electron').remote.process.platform === 'darwin' ? ': Cmd + Alt + L</b>' : ': Alt + Shift + L</b>')
 						,handler: 'lockRambox'
 						,id: 'lockRamboxBtn'
+					}
+					,{
+						 glyph: 'xf21e@FontAwesome'
+						,text: '服务健康概览'
+						,tooltip: 'View the health status of all services'
+						,handler: 'openHealthOverview'
+						,id: 'healthOverviewBtn'
 					}
 					,'->'
 					,{

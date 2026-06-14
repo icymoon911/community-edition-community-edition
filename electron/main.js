@@ -30,6 +30,7 @@ const config = new Config({
 		,window_display_behavior: 'taskbar_tray'
 		,auto_launch: !isDev
 		,flash_frame: true
+		,maxAutoReloadAttempts: 5
 		,window_close_behavior: 'keep_in_tray'
 		,start_minimized: false
 		,systemtray_indicator: true
@@ -363,6 +364,17 @@ ipcMain.on('setServiceNotifications', function(event, partition, op) {
 
 ipcMain.on('setDontDisturb', function(event, arg) {
 	config.set('dont_disturb', arg);
+});
+
+// Show Health Overview (triggered from tray menu)
+ipcMain.on('showHealthOverview', function(event) {
+	if (mainWindow) {
+		mainWindow.show();
+		mainWindow.focus();
+		mainWindow.webContents.executeJavaScript(
+			'if (Ext.cq1("app-main") && Ext.cq1("app-main").getController) { Ext.cq1("app-main").getController().openHealthOverview(); }'
+		);
+	}
 });
 
 // Reload app

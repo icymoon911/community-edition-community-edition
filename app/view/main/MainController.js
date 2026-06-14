@@ -480,4 +480,8 @@ Ext.define('Rambox.view.main.MainController', {
 	,openPreferences: function( btn ) {
 		Ext.create('Rambox.view.preferences.Preferences').show();
 	}
+
+	,openHealthOverview: function( btn ) {
+		Ext.create('Rambox.view.main.HealthOverview').show();
+	}
 });
