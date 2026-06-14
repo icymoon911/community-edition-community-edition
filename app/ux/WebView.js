@@ -36,6 +36,7 @@ Ext.define('Rambox.ux.WebView',{
 		}
 
 		const prefConfig = ipc.sendSync('getConfig');
+		me.zoomLevel = me.record.get('zoomLevel') || 0;
 		Ext.apply(me, {
 			 items: me.webViewConstructor()
 			,title: prefConfig.hide_tabbar_labels ? '' : (me.record.get('tabname') ? me.record.get('name') : '')
@@ -763,28 +764,28 @@ Ext.define('Rambox.ux.WebView',{
 	}
 
 	,zoomIn: function() {
-		if ( this.timeout ) clearTimeout( this.timeout );
-			this.timeout = setTimeout(() => {
-				var me = this;
-				var webview = me.getWebView();
-				me.zoomLevel = me.zoomLevel + 0.25;
-				if ( me.record.get('enabled') ) {
-					webview.setZoomLevel(me.zoomLevel);
-					me.record.set('zoomLevel', me.zoomLevel);
-				}
+		var me = this;
+		me.zoomLevel = me.zoomLevel + 0.25;
+		if ( me.timeout ) clearTimeout( me.timeout );
+		me.timeout = setTimeout(() => {
+			var webview = me.getWebView();
+			if ( me.record.get('enabled') ) {
+				webview.setZoomLevel(me.zoomLevel);
+				me.record.set('zoomLevel', me.zoomLevel);
+			}
 		}, 100);
 	}
 
 	,zoomOut: function() {
-		if ( this.timeout ) clearTimeout( this.timeout );
-			this.timeout = setTimeout(() => {
-				var me = this;
-				var webview = me.getWebView();
-				me.zoomLevel = me.zoomLevel - 0.25;
-				if ( me.record.get('enabled') ) {
-					webview.setZoomLevel(me.zoomLevel);
-					me.record.set('zoomLevel', me.zoomLevel);
-				}
+		var me = this;
+		me.zoomLevel = me.zoomLevel - 0.25;
+		if ( me.timeout ) clearTimeout( me.timeout );
+		me.timeout = setTimeout(() => {
+			var webview = me.getWebView();
+			if ( me.record.get('enabled') ) {
+				webview.setZoomLevel(me.zoomLevel);
+				me.record.set('zoomLevel', me.zoomLevel);
+			}
 		}, 100);
 	}
 

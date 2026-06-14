@@ -245,8 +245,15 @@ function createMasterPasswordWindow() {
 }
 
 function updateBadge(title) {
-	title = title.split(" - ")[0]; //Discard service name if present, could also contain digits
-	var messageCount = title.match(/\d+/g) ? parseInt(title.match(/\d+/g).join("")) : 0;
+	var match = title.match(/^\((\d+|•)\)/);
+	var messageCount = 0;
+	if (match) {
+		if (match[1] === '•') {
+			messageCount = 1;
+		} else {
+			messageCount = parseInt(match[1], 10);
+		}
+	}
 	messageCount = isNaN(messageCount) ? 0 : messageCount;
 
 	tray.setBadge(messageCount, config.get('systemtray_indicator'));

@@ -88,14 +88,15 @@ Ext.define('Rambox.view.add.AddController', {
 				,name: formValues.serviceName
 				,url: formValues.url
 				,align: formValues.align
-				,notifications: formValues.notifications
-				,muted: formValues.muted
-				,tabname: formValues.tabname
-				,statusbar: formValues.statusbar
-				,displayTabUnreadCounter: formValues.displayTabUnreadCounter
-				,includeInGlobalUnreadCounter: formValues.includeInGlobalUnreadCounter
-				,trust: formValues.trust
+				,notifications: !!formValues.notifications
+				,muted: !!formValues.muted
+				,tabname: !!formValues.tabname
+				,statusbar: !!formValues.statusbar
+				,displayTabUnreadCounter: !!formValues.displayTabUnreadCounter
+				,includeInGlobalUnreadCounter: !!formValues.includeInGlobalUnreadCounter
+				,trust: !!formValues.trust
 				,js_unread: formValues.js_unread
+				,disableAutoReloadOnFail: !!formValues.disableAutoReloadOnFail
 			});
 			service.save();
 			Ext.getStore('Services').add(service);

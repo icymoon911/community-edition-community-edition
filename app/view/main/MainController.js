@@ -324,7 +324,7 @@ Ext.define('Rambox.view.main.MainController', {
 		Ext.getCmp('mainTabBar').getEl().toggleCls('dontdisturb');
 
 		// If this method is called from Lock method, prevent showing toast
-		if ( !e ) return;
+		if ( called ) return;
 		Ext.toast({
 			 html: btn.pressed ? 'ENABLED' : 'DISABLED'
 			,title: 'Don\'t Disturb'
