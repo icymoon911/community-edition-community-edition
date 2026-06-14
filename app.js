@@ -139,6 +139,11 @@ ipc.on('reloadCurrentService', function(e) {
 	var tab = Ext.cq1('app-main').getActiveTab();
 	if ( tab.id !== 'ramboxTab' ) tab.reloadService();
 });
+// Open Health Overview (triggered from tray menu)
+ipc.on('openHealthOverview', function() {
+	var mainCtrl = Ext.cq1('app-main') ? Ext.cq1('app-main').getController() : null;
+	if (mainCtrl && mainCtrl.openHealthOverview) mainCtrl.openHealthOverview();
+});
 // Toggle Status Bar
 ipc.on('toggleStatusBar', function() {
 	var tab = Ext.cq1('app-main').getActiveTab();

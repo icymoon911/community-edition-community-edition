@@ -287,11 +287,15 @@ Ext.define('Rambox.ux.WebView',{
 		webview.addEventListener("did-start-loading", function() {
 			console.info('Start loading...', me.src);
 
+			me.record.set('healthStatus', 'loading');
 			if ( !me.down('statusbar').closed || !me.down('statusbar').keep ) me.down('statusbar').show();
 			me.down('statusbar').showBusy();
 		});
 
 		webview.addEventListener("did-stop-loading", function() {
+			if (me.record.get('healthStatus') !== 'error') {
+				me.record.set('healthStatus', 'ready');
+			}
 			me.down('statusbar').clearStatus({useDefaults: true});
 			if ( !me.down('statusbar').keep ) me.down('statusbar').hide();
 		});
@@ -345,7 +349,7 @@ Ext.define('Rambox.ux.WebView',{
 				case 0:
 					break
 				case -3: // An operation was aborted (due to user action) I think that gmail an other pages that use iframes stop some of them making this error fired
-					if ( attempt.length <= 4 ) return
+					if ( attempt.length <= me.getMaxRetryCount() + 1 ) return
 					setTimeout(() => me.reloadService(me), 200);
 					me.errorCodeLog = []
 					break;
@@ -357,7 +361,7 @@ Ext.define('Rambox.ux.WebView',{
 				case -100:
 				case -101:
 				case -105:
-					attempt.length > 4 ? me.onFailLoad(msg[e.errorCode]) : setTimeout(() => me.reloadService(me), 2000);
+					attempt.length > me.getMaxRetryCount() ? me.onFailLoad(msg[e.errorCode]) : setTimeout(() => me.reloadService(me), 2000);
 					break;
 				case -106:
 					me.onFailLoad(msg[e.errorCode])
@@ -368,7 +372,7 @@ Ext.define('Rambox.ux.WebView',{
 					// Note that this does NOT include failures during the actual "CONNECT" method
 					// of an HTTP proxy.
 				case -300:
-					attempt.length > 4 ? me.onFailLoad(msg[e.errorCode]) : me.reloadService(me);
+					attempt.length > me.getMaxRetryCount() ? me.onFailLoad(msg[e.errorCode]) : me.reloadService(me);
 					break;
 			}
 		});
@@ -628,6 +632,9 @@ Ext.define('Rambox.ux.WebView',{
 	,onFailLoad: function(v) {
 		let me = this
 		me.errorCodeLog = []
+		me.record.set('healthStatus', 'error');
+		me.record.set('lastFailTime', new Date().toLocaleString());
+		me.record.set('failCount', (me.record.get('failCount') || 0) + 1);
 		setTimeout(() => Ext.getCmp(me.id+'statusbar').setStatus({ text: '<i class="fa fa-warning fa-fw" aria-hidden="true"></i> The service failed at loading, Error: '+ v }), 1000);
 	}
 
@@ -738,11 +745,13 @@ Ext.define('Rambox.ux.WebView',{
 		me.removeAll();
 		me.add(me.webViewConstructor(enabled));
 		if ( enabled ) {
+			me.record.set('healthStatus', 'loading');
 			me.resumeEvent('afterrender');
 			me.show();
 			me.tab.setStyle('-webkit-filter', 'grayscale(0)');
 			me.onAfterRender();
 		} else {
+			me.record.set('healthStatus', 'disabled');
 			me.suspendEvent('afterrender');
 			me.tab.setStyle('-webkit-filter', 'grayscale(1)');
 		}
@@ -804,6 +813,15 @@ Ext.define('Rambox.ux.WebView',{
 			return this.down('component[cls=webview]').el.dom;
 		} else {
 			return false;
+		}
+	}
+
+	,getMaxRetryCount: function() {
+		try {
+			var config = ipc.sendSync('getConfig');
+			return (config.max_retry_count !== undefined && config.max_retry_count !== null) ? config.max_retry_count : 3;
+		} catch(e) {
+			return 3;
 		}
 	}
 });

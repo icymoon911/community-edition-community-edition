@@ -272,6 +272,18 @@ Ext.define('Rambox.view.preferences.Preferences',{
 						,hidden: process.platform !== 'win32'
 					},
 					{
+						 xtype: 'numberfield'
+						,name: 'max_retry_count'
+						,fieldLabel: 'Max auto-retry count on service load failure'
+						,labelAlign: 'top'
+						,value: config.max_retry_count !== undefined ? config.max_retry_count : 3
+						,minValue: 0
+						,maxValue: 20
+						,width: 360
+						,allowDecimals: false
+						,allowBlank: false
+					},
+					{
 						 xtype: 'textfield'
 						,fieldLabel: 'Override User-Agent for all services (needs to relaunch)'
 						,labelAlign: 'top'

@@ -69,5 +69,20 @@ Ext.define('Rambox.model.Service', {
 		 name: 'zoomLevel'
 		,type: 'number'
 		,defaultValue: 0
+	},{
+		 name: 'healthStatus'
+		,type: 'string'
+		,defaultValue: 'ready'
+		,persist: false
+	},{
+		 name: 'lastFailTime'
+		,type: 'string'
+		,defaultValue: ''
+		,persist: false
+	},{
+		 name: 'failCount'
+		,type: 'int'
+		,defaultValue: 0
+		,persist: false
 	}]
 });

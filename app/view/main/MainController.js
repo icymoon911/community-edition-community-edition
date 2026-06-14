@@ -480,4 +480,27 @@ Ext.define('Rambox.view.main.MainController', {
 	,openPreferences: function( btn ) {
 		Ext.create('Rambox.view.preferences.Preferences').show();
 	}
+
+	,openHealthOverview: function() {
+		var existing = Ext.ComponentQuery.query('#healthOverviewWindow')[0];
+		if (existing) {
+			existing.refreshContent();
+			existing.show();
+			return;
+		}
+		var win = Ext.create('Rambox.view.health.HealthOverview');
+		win.show();
+
+		// Auto-refresh when service health status changes
+		var store = Ext.getStore('Services');
+		var refreshFn = function() {
+			if (win && win.isVisible && win.isVisible()) {
+				win.refreshContent();
+			}
+		};
+		store.on('update', refreshFn);
+		win.on('close', function() {
+			store.un('update', refreshFn);
+		});
+	}
 });

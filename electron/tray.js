@@ -21,6 +21,15 @@ exports.create = function(win, config) {
 			}
 		},
 		{
+			 label: 'View Service Status'
+			,click() {
+				if (win.isMinimized()) win.restore();
+				if (!win.isVisible()) win.show();
+				win.focus();
+				win.webContents.send('openHealthOverview');
+			}
+		},
+		{
 			type: 'separator'
 		},
 		{

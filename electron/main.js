@@ -46,6 +46,7 @@ const config = new Config({
 		,user_agent: ''
 		,default_service: 'ramboxTab'
 		,sendStatistics: false
+		,max_retry_count: 3
 
 		,x: undefined
 		,y: undefined

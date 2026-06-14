@@ -6,6 +6,7 @@ Ext.define('Rambox.view.main.Main', {
 		,'Rambox.ux.WebView'
 		,'Rambox.ux.mixin.Badge'
 		,'Rambox.view.add.Add'
+		,'Rambox.view.health.HealthOverview'
 		,'Ext.ux.TabReorderer'
 	]
 
@@ -154,6 +155,28 @@ Ext.define('Rambox.view.main.Main', {
 							,tpl: '<img src="{[ values.type !== \"custom\" ? \"resources/icons/\"+values.logo : (values.logo == \"\" ? \"resources/icons/custom.png\" : values.logo) ]}" data-qtip="{type:capitalize}" width="32" style="{[ values.enabled ? \"-webkit-filter: grayscale(0)\" : \"-webkit-filter: grayscale(1)\" ]}" />'
 						}
 						,{
+							 xtype: 'templatecolumn'
+							,width: 28
+							,variableRowHeight: true
+							,tpl: '<svg width="12" height="12" style="vertical-align:middle;" data-qtip="{[this.getStatusTip(values)]}"><circle cx="6" cy="6" r="5" fill="{[this.getStatusColor(values)]}" /></svg>'
+							,getStatusColor: function(values) {
+								if (!values.enabled) return '#9e9e9e';
+								switch(values.healthStatus) {
+									case 'loading': return '#ff9800';
+									case 'error': return '#f44336';
+									default: return '#4caf50';
+								}
+							}
+							,getStatusTip: function(values) {
+								if (!values.enabled) return 'Disabled';
+								switch(values.healthStatus) {
+									case 'loading': return 'Loading';
+									case 'error': return 'Failed';
+									default: return 'Ready';
+								}
+							}
+						}
+						,{
 							 dataIndex: 'name'
 							,variableRowHeight: true
 							,flex: 1
@@ -249,6 +272,13 @@ Ext.define('Rambox.view.main.Main', {
 						,tooltip: locale['app.main[20]']+'<br/><b>'+locale['app.main[18]']+(require('electron').remote.process.platform === 'darwin' ? ': Cmd + Alt + L</b>' : ': Alt + Shift + L</b>')
 						,handler: 'lockRambox'
 						,id: 'lockRamboxBtn'
+					}
+					,{
+						 glyph: 'xf21e@FontAwesome'
+						,text: 'Service Health Overview'
+						,tooltip: 'View all services status and reload failed ones'
+						,handler: 'openHealthOverview'
+						,id: 'healthOverviewBtn'
 					}
 					,'->'
 					,{
